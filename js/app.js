@@ -46,6 +46,16 @@
 
   function loadSavedConfig() {
     try {
+      if (window.LEGAL_LENS_CONFIG && window.LEGAL_LENS_CONFIG.GEMINI_API_KEY) {
+        state.geminiKey = window.LEGAL_LENS_CONFIG.GEMINI_API_KEY;
+        if (window.LEGAL_LENS_CONFIG.FIREBASE_CONFIG) {
+          Firebase.init(window.LEGAL_LENS_CONFIG.FIREBASE_CONFIG).then(function (ok) {
+            state.firebaseReady = ok;
+          });
+        }
+        return;
+      }
+
       state.geminiKey = localStorage.getItem("ll_gemini_key") || null;
       var fbConfig = localStorage.getItem("ll_firebase_config");
       if (fbConfig) {
