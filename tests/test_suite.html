@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalLens Test Suite</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; background: #0f172a; color: #f8fafc; }
+        h1 { color: #818cf8; border-bottom: 2px solid #334155; padding-bottom: 0.5rem; }
+        .summary { display: flex; gap: 1rem; margin: 1.5rem 0; }
+        .stat-card { background: #1e293b; padding: 1rem 1.5rem; border-radius: 8px; border: 1px solid #334155; min-width: 120px; }
+        .stat-val { font-size: 2rem; font-weight: bold; }
+        .pass { color: #10b981; }
+        .fail { color: #ef4444; }
+        .test-case { background: #1e293b; margin-bottom: 0.75rem; padding: 1rem; border-radius: 6px; border-left: 4px solid #334155; }
+        .test-case.pass { border-left-color: #10b981; }
+        .test-case.fail { border-left-color: #ef4444; }
+        .test-title { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; }
+        .test-detail { font-size: 0.85rem; color: #94a3b8; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>⚖️ LegalLens Automated Test Suite</h1>
+    <p>Running in-browser unit tests for sanitization, document parsing, schema validation, and module integrity.</p>
+
+    <div class="summary">
+        <div class="stat-card"><div>Total Tests</div><div class="stat-val" id="total-count">0</div></div>
+        <div class="stat-card"><div>Passed</div><div class="stat-val pass" id="pass-count">0</div></div>
+        <div class="stat-card"><div>Failed</div><div class="stat-val fail" id="fail-count">0</div></div>
+    </div>
+
+    <div id="test-results"></div>
+
+    <!-- Scripts under test -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/document-parser.js"></script>
+    <script src="../js/ai-engine.js"></script>
+    <script src="../js/legal-analyzer.js"></script>
+    <script src="../js/chat.js"></script>
+    <script src="../js/comparison.js"></script>
+
+    <script>
+        const tests = [];
+        function test(name, fn) { tests.push({ name, fn }); }
+        function assert(condition, message) { if (!condition) throw new Error(message || "Assertion failed"); }
+        function assertEquals(actual, expected, message) { if (actual !== expected) throw new Error(`${message || 'Failed'}: expected "${expected}", got "${actual}"`); }
+
+        // ==================== TEST CASES ====================
+        
+        test("Utils: generateId generates unique string with ll- prefix", () => {
+            const id1 = LegalLens.Utils.generateId();
+            const id2 = LegalLens.Utils.generateId();
+            assert(id1.startsWith("ll-"), "ID should start with ll-");
+            assert(id1 !== id2, "IDs must be unique");
+        });
+
+        test("Utils: sanitizeHTML prevents XSS injections", () => {
+            const malicious = '<script>alert("xss")<\/script><img src="x" onerror="steal()">';
+            const clean = LegalLens.Utils.sanitizeHTML(malicious);
+            assert(!clean.includes("<script>"), "Should escape <script>");
+            assert(!clean.includes("<img"), "Should escape <img>");
+            assert(clean.includes("&lt;script&gt;"), "Should encode entities");
+        });
+
+        test("Utils: wordCount accurately calculates words", () => {
+            const text = "This is a mutual non-disclosure agreement with seven words.";
+            assertEquals(LegalLens.Utils.wordCount(text), 8);
+            assertEquals(LegalLens.Utils.wordCount(""), 0);
+        });
+
+        test("Utils: formatFileSize correctly formats bytes", () => {
+            assertEquals(LegalLens.Utils.formatFileSize(1024), "1.0 KB");
+            assertEquals(LegalLens.Utils.formatFileSize(1048576), "1.0 MB");
+        });
+
+        test("Utils: safeParseJSON extracts clean JSON from codeblocks", () => {
+            const raw = '```json\n{"status": "ok", "score": 9}\n```';
+            const parsed = LegalLens.Utils.safeParseJSON(raw);
+            assert(parsed !== null, "Should parse JSON inside markdown");
+            assertEquals(parsed.status, "ok");
+            assertEquals(parsed.score, 9);
+        });
+
+        test("Utils: validateFile enforces 10MB limit and extensions", () => {
+            const validTxt = { name: "contract.txt", size: 5000 };
+            const oversized = { name: "huge.pdf", size: 15 * 1024 * 1024 };
+            const badExt = { name: "virus.exe", size: 1000 };
+
+            assert(LegalLens.Utils.validateFile(validTxt).valid, "Valid file should pass");
+            assert(!LegalLens.Utils.validateFile(oversized).valid, "Oversized should fail");
+            assert(!LegalLens.Utils.validateFile(badExt).valid, "Invalid ext should fail");
+        });
+
+        test("DocumentParser: _cleanText normalizes line breaks and whitespace", () => {
+            const messy = "Clause 1\r\n\r\n\r\n\r\nThis   has   extra    spaces.";
+            const clean = LegalLens.DocumentParser._cleanText(messy);
+            assert(!clean.includes("\r"), "Should remove CRLF");
+            assert(!clean.includes("   "), "Should remove excess spaces");
+        });
+
+        test("AIEngine: prepareText limits large documents responsibly", () => {
+            const longDoc = "A".repeat(80000);
+            const prepared = LegalLens.AIEngine.prepareText(longDoc, 10000);
+            assert(prepared.length < 20000, "Should chunk large document");
+            assert(prepared.includes("[NOTE: Document was truncated"), "Should append truncation notice");
+        });
+
+        test("Chat: getSuggestedQuestions returns high-quality legal questions", () => {
+            const questions = LegalLens.Chat.getSuggestedQuestions();
+            assert(Array.isArray(questions), "Questions should be an array");
+            assert(questions.length >= 5, "Should have at least 5 suggested questions");
+            assert(questions.some(q => q.toLowerCase().includes("obligations")), "Should contain obligation query");
+        });
+
+        test("Firebase: degrades gracefully when config is missing", async () => {
+            const ready = await LegalLens.Firebase.init({});
+            assertEquals(ready, false, "Should resolve false without crashing");
+        });
+
+        // Run all tests
+        let passed = 0, failed = 0;
+        const container = document.getElementById("test-results");
+
+        for (const t of tests) {
+            const card = document.createElement("div");
+            card.className = "test-case";
+            try {
+                t.fn();
+                card.classList.add("pass");
+                card.innerHTML = `<div class="test-title">✅ ${t.name}</div><div class="test-detail">Status: Passed</div>`;
+                passed++;
+            } catch (err) {
+                card.classList.add("fail");
+                card.innerHTML = `<div class="test-title">❌ ${t.name}</div><div class="test-detail">Error: ${err.message}</div>`;
+                failed++;
+            }
+            container.appendChild(card);
+        }
+
+        document.getElementById("total-count").textContent = tests.length;
+        document.getElementById("pass-count").textContent = passed;
+        document.getElementById("fail-count").textContent = failed;
+    </script>
+</body>
+</html>
