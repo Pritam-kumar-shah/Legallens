@@ -1,0 +1,47 @@
+STANDARD NON-DISCLOSURE AGREEMENT (NDA)
+
+This Non-Disclosure Agreement (the "Agreement") is entered into as of October 1, 2025, by and between:
+Disclosing Party: Alpha Tech Innovations Inc., a Delaware corporation ("Discloser")
+Receiving Party: Beta Solutions LLC, a California limited liability company ("Recipient")
+
+1. PURPOSE
+The Discloser intends to disclose certain confidential and proprietary information to the Recipient solely for the purpose of evaluating a potential commercial partnership between the parties (the "Permitted Purpose").
+
+2. DEFINITION OF CONFIDENTIAL INFORMATION
+"Confidential Information" means all non-public, confidential or proprietary information disclosed before, on, or after the date hereof, by the Discloser to the Recipient, whether orally or in writing, that is designated as confidential or that reasonably should be understood to be confidential given the nature of the information.
+
+3. OBLIGATIONS OF RECEIVING PARTY
+The Recipient agrees to:
+(a) Protect and safeguard the confidentiality of all Confidential Information with at least the same degree of care as it uses for its own confidential information, but in no event less than a reasonable degree of care;
+(b) Use the Confidential Information solely for the Permitted Purpose;
+(c) Not copy, reverse engineer, or reproduce any part of the Confidential Information without prior written consent;
+(d) Disclose Confidential Information only to its employees, advisors, and contractors who need to know such information for the Permitted Purpose and who are bound by confidentiality obligations at least as restrictive as this Agreement.
+
+4. EXCLUSIONS
+Confidential Information does not include information that:
+(a) Is or becomes publicly known through no breach of this Agreement by Recipient;
+(b) Was already in Recipient's lawful possession prior to disclosure;
+(c) Is received from a third party without breach of any confidentiality obligation;
+(d) Is independently developed by Recipient without reference to or reliance upon Discloser's Confidential Information.
+
+5. TERM AND TERMINATION
+This Agreement shall remain in effect for a period of two (2) years from the Effective Date. The confidentiality obligations set forth herein shall survive the termination of this Agreement for an additional period of three (3) years.
+
+6. RETURN OR DESTRUCTION OF MATERIALS
+Upon written request by Discloser, Recipient shall promptly return or certify in writing the destruction of all tangible copies of Confidential Information within thirty (30) days.
+
+7. NO WARRANTY AND REMEDIES
+All Confidential Information is provided "AS IS". The parties acknowledge that any breach of this Agreement may cause irreparable harm for which monetary damages alone would be inadequate, and Discloser shall be entitled to seek injunctive relief in addition to any other remedies available at law.
+
+8. GOVERNING LAW AND JURISDICTION
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of law principles.
+
+IN WITNESS WHEREOF, the parties hereto have executed this Non-Disclosure Agreement as of the date first written above.
+
+ALPHA TECH INNOVATIONS INC.
+By: ___________________________
+Name: John Doe, Chief Executive Officer
+
+BETA SOLUTIONS LLC
+By: ___________________________
+Name: Jane Smith, Managing Director

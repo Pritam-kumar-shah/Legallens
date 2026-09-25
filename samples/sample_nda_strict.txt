@@ -1,0 +1,33 @@
+MUTUAL NON-DISCLOSURE AND RESTRICTIVE COVENANTS AGREEMENT
+
+This Restrictive Non-Disclosure Agreement (the "Agreement") is made effective as of October 1, 2025, by and between:
+Party A: Alpha Tech Innovations Inc., a Delaware corporation ("Alpha")
+Party B: Beta Solutions LLC, a California limited liability company ("Beta")
+
+1. EXPANDED DEFINITION OF PROPRIETARY INFORMATION
+"Proprietary Information" includes, without limitation, all software source code, financial projections, customer identities, employee salary structures, trade secrets, business strategies, and unannounced product roadmaps. Any oral disclosure made during any meeting shall automatically be deemed Proprietary Information without requirement of subsequent written marking.
+
+2. ASYMMETRIC CONFIDENTIALITY AND NON-CIRCUMVENTION
+(a) Beta agrees to hold all Alpha Proprietary Information in strict confidence and apply maximum security measures, including dual-factor encrypted physical vaults.
+(b) Non-Circumvention: Beta covenants that for a period of five (5) years, it shall not directly or indirectly contact, solicit, or engage any client, vendor, or contractor introduced by Alpha.
+(c) Non-Solicitation of Personnel: Beta shall not hire, recruit, or attempt to induce any Alpha employee to leave Alpha for a period of three (3) years.
+
+3. DURATION AND PERPETUAL OBLIGATION
+This Agreement shall govern all disclosures made over a five (5) year term. With respect to trade secrets and customer data, the obligation of non-disclosure shall be PERPETUAL and continue indefinitely following termination.
+
+4. MANDATORY AUDIT RIGHTS AND LIQUIDATED DAMAGES
+(a) Alpha reserves the absolute right, upon forty-eight (48) hours prior notice, to inspect and audit Beta's computer systems, storage repositories, and facilities to verify compliance.
+(b) Liquidated Damages: In the event of any unauthorized disclosure or material breach by Beta, Beta shall pay liquidated damages of $250,000 USD per incident, without prejudice to Alpha's right to seek punitive damages and full attorney fee indemnification.
+
+5. JURISDICTION AND DISPUTE RESOLUTION
+This Agreement shall be governed strictly by the laws of the State of New York. Any legal dispute shall be resolved through binding arbitration in New York County, New York. Beta waives any right to a jury trial or class action participation.
+
+IN WITNESS WHEREOF, the parties hereto have signed this Agreement.
+
+ALPHA TECH INNOVATIONS INC.
+By: ___________________________
+Title: General Counsel
+
+BETA SOLUTIONS LLC
+By: ___________________________
+Title: Authorized Signatory

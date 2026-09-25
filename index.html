@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalLens - AI Legal Document Assistant</title>
+    
+    <!-- External Libraries -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Setup Modal -->
+    <div id="setup-modal" class="modal-overlay" role="dialog" aria-labelledby="setup-title" aria-modal="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span class="logo-emoji">⚖️</span>
+                <h2 id="setup-title">Welcome to LegalLens</h2>
+            </div>
+            <div class="modal-body">
+                <p>Please configure your API keys to get started.</p>
+                <div class="form-group">
+                    <label for="gemini-key-input">Gemini API Key</label>
+                    <input type="password" id="gemini-key-input" placeholder="AIzaSy...">
+                </div>
+                <div class="form-group">
+                    <label for="firebase-config-input">Firebase Config (JSON)</label>
+                    <textarea id="firebase-config-input" rows="5" placeholder='{
+  "apiKey": "...",
+  "authDomain": "...",
+  "projectId": "..."
+}'></textarea>
+                </div>
+                <p class="security-note">Your keys are stored locally in your browser and never sent to any server.</p>
+                <div class="modal-actions">
+                    <button id="save-setup-btn" class="btn btn-primary">Save & Start</button>
+                    <button id="skip-firebase-btn" class="btn btn-text">Skip Firebase (use without persistence)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header id="main-header" role="banner">
+        <div class="header-container">
+            <div class="logo-area">
+                <span class="logo-emoji">⚖️</span>
+                <h1 class="app-name">LegalLens</h1>
+                <span class="tagline">AI-Powered Legal Document Assistant</span>
+            </div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme">🌙</button>
+                <button id="settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Legal Disclaimer -->
+    <div id="legal-disclaimer" role="alert" class="disclaimer-banner">
+        <div class="disclaimer-content">
+            <span class="warning-icon">⚠️</span>
+            <p>This tool provides informational assistance only and does not constitute legal advice. Always consult a qualified legal professional for legal matters.</p>
+        </div>
+        <button class="dismiss-btn" aria-label="Dismiss disclaimer">×</button>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Navigation Tabs -->
+        <nav id="nav-tabs" role="tablist" aria-label="Main navigation">
+            <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-upload" data-tab="upload" id="tab-upload">
+                📄 Upload
+            </button>
+            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-analyze" data-tab="analyze" id="tab-analyze">
+                🔍 Analyze
+            </button>
+            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-compare" data-tab="compare" id="tab-compare">
+                ⚖️ Compare
+            </button>
+            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-chat" data-tab="chat" id="tab-chat">
+                💬 Chat
+            </button>
+        </nav>
+
+        <div id="tab-content" class="tab-content-container">
+            <!-- Upload Panel -->
+            <section id="panel-upload" class="tab-panel active" role="tabpanel" aria-labelledby="tab-upload">
+                <div class="upload-container">
+                    <div id="drop-zone" class="drop-zone">
+                        <div class="drop-content">
+                            <span class="upload-icon">📁</span>
+                            <h3>Drop files here</h3>
+                            <p>or click to browse • PDF, DOCX, TXT (max 10MB)</p>
+                        </div>
+                        <input type="file" id="file-input" accept=".pdf,.docx,.txt" multiple hidden>
+                    </div>
+                    
+                    <div class="document-list-header">
+                        <h2>Your Documents</h2>
+                    </div>
+                    <div id="document-list" class="document-list">
+                        <div id="empty-state" class="empty-state">
+                            <p>No documents uploaded yet</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analyze Panel -->
+            <section id="panel-analyze" class="tab-panel" role="tabpanel" aria-labelledby="tab-analyze" hidden>
+                <div class="panel-header-bar">
+                    <select id="doc-select-analyze" class="doc-select" aria-label="Select document to analyze">
+                        <option value="">Select a document...</option>
+                    </select>
+                    <button id="analyze-btn" class="btn btn-primary" disabled>Run Analysis</button>
+                </div>
+                
+                <div id="analysis-placeholder" class="placeholder-state">
+                    <p>Select a document and click Analyze to begin</p>
+                </div>
+
+                <div id="analysis-results" class="results-container" hidden>
+                    <div id="result-tabs" class="result-sub-tabs" role="tablist">
+                        <button class="result-tab-btn active" role="tab" aria-selected="true" aria-controls="summary-content" data-result="summary">📋 Summary</button>
+                        <button class="result-tab-btn" role="tab" aria-selected="false" aria-controls="clauses-content" data-result="clauses">📌 Clauses</button>
+                        <button class="result-tab-btn" role="tab" aria-selected="false" aria-controls="risks-content" data-result="risks">⚠️ Risks</button>
+                        <button class="result-tab-btn" role="tab" aria-selected="false" aria-controls="checklist-content" data-result="checklist">✅ Checklist</button>
+                    </div>
+                    
+                    <div class="result-panels">
+                        <div id="summary-content" class="result-panel active" role="tabpanel"></div>
+                        <div id="clauses-content" class="result-panel" role="tabpanel" hidden></div>
+                        <div id="risks-content" class="result-panel" role="tabpanel" hidden></div>
+                        <div id="checklist-content" class="result-panel" role="tabpanel" hidden></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Compare Panel -->
+            <section id="panel-compare" class="tab-panel" role="tabpanel" aria-labelledby="tab-compare" hidden>
+                <div class="panel-header-bar">
+                    <div class="compare-selectors">
+                        <select id="compare-doc1-select" class="doc-select" aria-label="Select Document 1">
+                            <option value="">Document 1...</option>
+                        </select>
+                        <span class="compare-vs">vs</span>
+                        <select id="compare-doc2-select" class="doc-select" aria-label="Select Document 2">
+                            <option value="">Document 2...</option>
+                        </select>
+                    </div>
+                    <button id="compare-btn" class="btn btn-primary" disabled>Compare Documents</button>
+                </div>
+                
+                <div id="compare-placeholder" class="placeholder-state">
+                    <p>Select two documents to compare</p>
+                </div>
+
+                <div id="comparison-results" class="results-container" hidden>
+                    <!-- Diff content will be injected here -->
+                </div>
+            </section>
+
+            <!-- Chat Panel -->
+            <section id="panel-chat" class="tab-panel" role="tabpanel" aria-labelledby="tab-chat" hidden>
+                <div class="chat-header">
+                    <select id="chat-doc-select" class="doc-select" aria-label="Select document context for chat">
+                        <option value="general">General (No specific document)</option>
+                    </select>
+                </div>
+                
+                <div id="chat-messages" class="chat-messages" aria-live="polite" role="log">
+                    <div class="chat-message assistant">
+                        <div class="message-content">
+                            Hello! I'm LegalLens, your AI legal assistant. How can I help you today?
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="suggested-questions" class="suggested-questions">
+                    <button class="suggested-question">Summarize this document</button>
+                    <button class="suggested-question">What are the key obligations?</button>
+                    <button class="suggested-question">Are there any hidden risks?</button>
+                </div>
+
+                <div id="chat-input-area" class="chat-input-area">
+                    <div class="input-wrapper">
+                        <input type="text" id="chat-input" placeholder="Ask about your document..." aria-label="Chat input">
+                        <button id="chat-send-btn" class="icon-btn send-btn" aria-label="Send message">➤</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="main-footer" role="contentinfo">
+        <div class="footer-content">
+            <p>&copy; 2024 LegalLens. Built with Gemini AI.</p>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="github-link">GitHub</a>
+        </div>
+    </footer>
+
+    <!-- Utilities -->
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true" hidden>
+        <div class="spinner"></div>
+        <p id="loading-text">Processing...</p>
+    </div>
+
+    <div id="notification-area" class="notification-area" aria-live="assertive" role="status"></div>
+
+    <!-- Scripts (Loaded at end of body) -->
+    <script src="js/utils.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/document-parser.js"></script>
+    <script src="js/ai-engine.js"></script>
+    <script src="js/legal-analyzer.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/comparison.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
