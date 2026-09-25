@@ -23,8 +23,11 @@ class LegalLensHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def log_message(self, format, *args):
-        # Clean terminal output
-        sys.stdout.write(f"[LegalLens] {args[0]} - {args[1]}\n")
+        try:
+            sys.stdout.write(f"[LegalLens] {args[0]} - {args[1]}\n")
+            sys.stdout.flush()
+        except Exception:
+            pass
 
 def run(port=DEFAULT_PORT):
     # Ensure working directory is the script directory
@@ -37,12 +40,13 @@ def run(port=DEFAULT_PORT):
         with socketserver.TCPServer(("", port), handler) as httpd:
             url = f"http://localhost:{port}"
             print("=" * 60)
-            print("  ⚖️  LegalLens — AI Legal Document Assistant")
+            print("  LegalLens - AI Legal Document Assistant")
             print("=" * 60)
             print(f"  Server running at: {url}")
             print("  Opening browser automatically...")
             print("  Press Ctrl+C to stop the server.")
             print("=" * 60)
+            sys.stdout.flush()
             
             try:
                 webbrowser.open(url)
@@ -51,7 +55,7 @@ def run(port=DEFAULT_PORT):
                 
             httpd.serve_forever()
     except OSError as e:
-        if "Address already in use" in str(e) or e.errno == 98 or e.errno == 10048:
+        if "Address already in use" in str(e) or getattr(e, 'errno', 0) in (98, 10048):
             print(f"Port {port} is in use, trying {port + 1}...")
             run(port + 1)
         else:
