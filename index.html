@@ -18,35 +18,7 @@
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Setup Modal -->
-    <div id="setup-modal" class="modal-overlay" role="dialog" aria-labelledby="setup-title" aria-modal="true">
-        <div class="modal-card">
-            <div class="modal-header">
-                <span class="logo-emoji">⚖️</span>
-                <h2 id="setup-title">Welcome to LegalLens</h2>
-            </div>
-            <div class="modal-body">
-                <p>Please configure your API keys to get started.</p>
-                <div class="form-group">
-                    <label for="gemini-key-input">Gemini API Key</label>
-                    <input type="password" id="gemini-key-input" placeholder="AIzaSy...">
-                </div>
-                <div class="form-group">
-                    <label for="firebase-config-input">Firebase Config (JSON)</label>
-                    <textarea id="firebase-config-input" rows="5" placeholder='{
-  "apiKey": "...",
-  "authDomain": "...",
-  "projectId": "..."
-}'></textarea>
-                </div>
-                <p class="security-note">Your keys are stored locally in your browser and never sent to any server.</p>
-                <div class="modal-actions">
-                    <button id="save-setup-btn" class="btn btn-primary">Save & Start</button>
-                    <button id="skip-firebase-btn" class="btn btn-text">Skip Firebase (use without persistence)</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Main Header -->
     <header id="main-header" role="banner">
@@ -58,7 +30,6 @@
             </div>
             <div class="header-actions">
                 <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme">🌙</button>
-                <button id="settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
             </div>
         </div>
     </header>

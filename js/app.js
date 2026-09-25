@@ -33,13 +33,6 @@
     bindEvents();
     initTheme();
     populateSuggestedQuestions();
-
-    // Show setup modal if no API key saved
-    if (!state.geminiKey) {
-      showSetupModal();
-    } else {
-      hideSetupModal();
-    }
   }
 
   /* ────────────────── Configuration ────────────────── */
